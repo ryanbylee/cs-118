@@ -1,6 +1,6 @@
 #!/bin/bash
 basedir="$(dirname "$(realpath "$0")")"
-docker run --interactive --rm --privileged -e DISPLAY \
+docker run --interactive --privileged -e DISPLAY \
              -p 8080:8080 \
              --tmpfs=/curr/${USER}:exec,mode=755,uid=$(id -u),gid=$(id -g) \
              --tty \

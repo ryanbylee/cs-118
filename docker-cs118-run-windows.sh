@@ -2,7 +2,7 @@
 
 # Replace "Replace with your folder path" to your project folder path, such as C:/Users/zhaoj/Desktop/winter22-project0
 
-winpty docker run --interactive --rm --privileged -e DISPLAY \
+winpty docker run --interactive --privileged -e DISPLAY \
              -p 8080:8080 \
              --tmpfs=/curr/${USER}:exec,mode=755,uid=$(id -u),gid=$(id -g) \
              --tty \

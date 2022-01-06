@@ -2,12 +2,17 @@
 
 # Replace "Replace with your folder path" to your project folder path, such as C:/Users/zhaoj/Desktop/winter22-project0
 
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+WINDOWSPATH=$(echo $SCRIPTPATH | sed 's/^\///' | sed 's/\//\\/g' | sed 's/^./\0:/')
+
+echo "Starting in $WINDOWSPATH"
+
 winpty docker run --interactive --privileged -e DISPLAY \
              -p 8080:8080 \
              --tmpfs=/curr/${USER}:exec,mode=755,uid=$(id -u),gid=$(id -g) \
              --tty \
-             --volume=/"Replace with your folder path"/setup-windows.sh:/opt/docker-cs118/setup.sh:ro \
-             --volume=/"Replace with your folder path"/:/project:rw \
+             --volume=$WINDOWSPATH/setup-windows.sh:/opt/docker-cs118/setup.sh:ro \
+             --volume=$WINDOWSPATH:/project:rw \
              ubuntu:20.04
 
 # ====================== Example ===============================

@@ -1,6 +1,6 @@
 # CS118 Project 0
 
-This is the repo for winter22 cs118 project 0.
+This is the repo for spring23 cs118 project 0.
 
 ## Academic Integrity Note
 
@@ -8,8 +8,29 @@ You are encouraged to host your code in private repositories on [GitHub](https:/
 
 ## Provided Files
 
-`docker-cs118-run.sh` is file to setup and configure Docker container.
-`project` is folder to develop codes for future projects.
+- `project` is folder to develop codes for future projects.
+- `docker-compose.yaml` and `Dockerfile` are files configuring the containers.
+
+## Bash commands
+
+```bash
+# Setup the container(s) (make setup)
+docker-compose up -d
+
+# Bash into the container (make shell)
+docker-compose exec node1 bash
+
+# Remove container(s) and the Docker image (make clean)
+docker-compose down -v --rmi all --remove-orphans
+```
+
+## Environment
+
+- OS: ubuntu 22.04
+- IP: 192.168.10.225. NOT accessible from the host machine.
+- Port forwarding: container 8080 <-> host 8080
+  - Use http://localhost:8080 to access the HTTP server in the container.
+- Files in this repo are in the `/project` folder. That means, `server.c` is `/project/project/server.c` in the container.
 
 ## TODO
 

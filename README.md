@@ -15,13 +15,13 @@ You are encouraged to host your code in private repositories on [GitHub](https:/
 
 ```bash
 # Setup the container(s) (make setup)
-docker-compose up -d
+docker compose up -d
 
 # Bash into the container (make shell)
-docker-compose exec node1 bash
+docker compose exec node1 bash
 
 # Remove container(s) and the Docker image (make clean)
-docker-compose down -v --rmi all --remove-orphans
+docker compose down -v --rmi all --remove-orphans
 ```
 
 ## Environment

@@ -1,8 +1,8 @@
 setup:
-	docker-compose up -d
+	docker compose up -d
 
 shell:
-	docker-compose exec node1 bash
+	docker compose exec node1 bash
 
 clean:
-	docker-compose down -v --rmi all --remove-orphans
+	docker compose down -v --rmi all --remove-orphans

@@ -9,17 +9,21 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <signal.h>
+#include <string.h>
 
 #define PORT 8080
 #define BACKLOG 10
 
 int main(int argc, char *argv[]) {
   char buf[2048];
-  char resp[] = "HTTP/1.0 200 OK\r\n"
-                "Server: webserver-c\r\n"
-                "Content-type: text/html\r\n\r\n"
-                "<html>hello, world</html>\r\n";
+  // char resp[] = "HTTP/1.0 200 OK\r\n"
+  //               "Server: server-c\r\n"
+  //               "Content-type: text/html\r\n\r\n"
+  //               "<html>Hello world!</html>\r\n";
+  
+  char *readFile = (char*) malloc(104857600 * sizeof(char));
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if (sockfd == -1){
@@ -72,14 +76,54 @@ int main(int argc, char *argv[]) {
     }
     char method[1024], uri[1024], version[1024];
     printf("%s", buf);
-    // sscanf(buf, "%s %s %s", method, uri, version);
-    // printf("[%s:%u] %s %s %s\n", inet_ntoa(clientAddr.sin_addr),
-    //         ntohs(clientAddr.sin_port), method, version, uri);
-    if (write(singlesock, resp, strlen(resp)) < 0){
-      perror("server: write\n");
-      continue;
+    sscanf(buf, "%s %s %s", method, uri, version);
+    char uri_modified[strlen(uri)];
+    if (strlen(uri) > 0){
+      strncpy(uri_modified, uri + 1, strlen(uri));
     }
-    close(singlesock);
+    
+    printf("requested file: %s\n", uri_modified);
+
+    //char readFile[MAXFILESIZE + 1];
+
+    FILE *requested_file = fopen(uri_modified, "r");
+    
+    if (requested_file != NULL){
+      struct stat fileStat;
+      int fd = fileno(requested_file);
+      fstat(fd, &fileStat);
+      off_t size = fileStat.st_size;
+      size_t length = fread(readFile, sizeof(char), size, requested_file);
+      readFile[length + 1] = '\0';
+      printf("successfully read file");
+      fclose(requested_file);
+      char resp[] = "HTTP/1.0 200 OK\r\n"
+                "Server: server-c\r\n"
+                "Content-type: text/html\r\n\r\n\0"
+                ;
+      strcat(resp, readFile);
+      if (write(singlesock, resp, strlen(resp)) < 0){
+        perror("server: write\n");
+        continue;
+      }
+      close(singlesock);
+    }else{
+      char resp[] = "HTTP/1.0 404 Not Found\r\n"
+                "Server: server-c\r\n"
+                "Content-type: text/html\r\n\r\n"
+                "<html>404 Not Found</html>\r\n";
+      if (write(singlesock, resp, strlen(resp)) < 0){
+        perror("server: write\n");
+        continue;
+      }
+      close(singlesock);
+    }
+    
+    // if (write(singlesock, resp, strlen(resp)) < 0){
+    //   perror("server: write\n");
+    //   continue;
+    // }
+    // close(singlesock);
   }
 
   return 0;

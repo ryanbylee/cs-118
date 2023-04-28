@@ -11,6 +11,8 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <dirent.h>
+#include <ctype.h>
 
 #define PORT 8080
 #define BACKLOG 10
@@ -86,18 +88,99 @@ int main(int argc, char *argv[]) {
     char method[1024], uri[1024], version[1024];
     printf("%s", buf);
     sscanf(buf, "%s %s %s", method, uri, version);
-    char uri_modified[strlen(uri)];
+    char uri_modified[1024];
     if (strlen(uri) > 0){
       strncpy(uri_modified, uri + 1, strlen(uri));
     }
     
     printf("requested file: %s\n", uri_modified);
-    char fileName[strlen(uri)];
+
+    char uri_spaceFirst[strlen(uri_modified)];
+    char uri_spaceSecond[strlen(uri_modified)];
+    
+    
+    for (int i = 0; i < strlen(uri_modified); i++){
+      if (uri_modified[i] == '%' && i < strlen(uri_modified) - 2){
+        if (uri_modified[i + 1] == '2'){
+          if (uri_modified[i + 2] == '0'){
+            strncpy(uri_spaceFirst, uri_modified, i);
+            uri_spaceFirst[i] = '\0';
+            strcat(uri_spaceFirst, " \0");
+            strncpy(uri_spaceSecond, uri_modified + i + 3, strlen(uri_modified) - i - 2);
+            uri_spaceSecond[strlen(uri_modified) - i - 3] = '\0';
+            strcat(uri_spaceSecond, "\0");
+            strcat(uri_spaceFirst, uri_spaceSecond);
+            printf("uri with space replacement: %s\n", uri_spaceFirst);
+            strcpy(uri_modified, uri_spaceFirst);
+          }
+
+          if (uri_modified[i + 2] == '5'){
+            strncpy(uri_spaceFirst, uri_modified, i);
+            uri_spaceFirst[i] = '\0';
+            strcat(uri_spaceFirst, "%\0");
+            strncpy(uri_spaceSecond, uri_modified + i + 3, strlen(uri_modified) - i - 2);
+            uri_spaceSecond[strlen(uri_modified) - i - 3] = '\0';
+            strcat(uri_spaceSecond, "\0");
+            strcat(uri_spaceFirst, uri_spaceSecond);
+            printf("uri with space replacement: %s\n", uri_spaceFirst);
+            strcpy(uri_modified, uri_spaceFirst);
+          }
+        }
+      }
+    }
+
+
+
+    
+    
+    char uri_modified_lowercase[strlen(uri_modified)];
+    strcpy(uri_modified_lowercase, uri_modified);
+    for (int i = 0; i < strlen(uri_modified_lowercase); i++){
+      uri_modified_lowercase[i] = tolower(uri_modified_lowercase[i]);
+    }
+
+    // DIR *directory;
+    // char workingdir[1024];
+    // if (getcwd(workingdir, 1024) == NULL){
+    //   perror("server: cwd error\n");
+    //   return 1;
+    // }
+    // directory = opendir(workingdir);
+    // // struct dirent *dir;
+    // // if (directory){
+    // //   while ((dir = readdir(directory)) != NULL){
+    // //     if (!strcasecmp(uri_modified, dir->d_name)){
+    // //       strcpy(uri_modified, dir->d_name);
+    // //       break;
+    // //     }
+    // //     // char dirFileNameLower[strlen(dir->d_name)];
+    // //     // strcpy(dirFileNameLower, dir->d_name);
+    // //     // for (int i = 0; i < strlen(dirFileNameLower); i++){
+    // //     //   dirFileNameLower[i] = tolower(dirFileNameLower[i]);
+    // //     // }
+    // //     // if (!strcmp(uri_modified_lowercase, dirFileNameLower)){
+    // //     //   strcpy(uri_modified, dir->d_name);
+    // //     //   printf("uri_modified is now: %s\n", uri_modified);
+    // //     //   break;
+    // //     // }
+    // //   }
+    // //   closedir(directory);
+    // // }else{
+    // //   return 1;
+    // // }
+
+    char fileName[strlen(uri_modified)];
     if (strlen(uri_modified) > 0){
       strncpy(fileName, uri_modified, strlen(uri));
     }
     char * token = strtok(fileName, ".");
     token = strtok(NULL, ".");
+    if (token != NULL){
+      for (int i = 0; i < strlen(token); i++){
+        token[i] = tolower(token[i]);
+      }
+    }
+    
     printf("requeted file format: %s\n", token);
 
     //char readFile[MAXFILESIZE + 1];
@@ -234,7 +317,8 @@ int main(int argc, char *argv[]) {
     //   continue;
     // }
     // close(singlesock);
-  }
+    
 
+  }
   return 0;
 }

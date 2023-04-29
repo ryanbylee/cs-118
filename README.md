@@ -1,15 +1,11 @@
-# CS118 Project 0
+# CS118 Project 1: HTTP Server
 
-This is the repo for spring23 cs118 project 0.
-
-## Academic Integrity Note
-
-You are encouraged to host your code in private repositories on [GitHub](https://github.com/), [GitLab](https://gitlab.com), or other places.  At the same time, you are PROHIBITED to make your code for the class project public during the class or any time after the class.  If you do so, you will be violating academic honestly policy that you have signed, as well as the student code of conduct and be subject to serious sanctions.
+This is the repo for spring23 CS118 project 1, which consists of the source code for a HTTP server that is capable of sending the file requested by a client through HTTP.
 
 ## Provided Files
 
-- `project` is folder to develop codes for future projects.
-- `docker-compose.yaml` and `Dockerfile` are files configuring the containers.
+- `project` folder stores Makefile and server.c.
+- `docker-compose.yaml` and `Dockerfile` are files configuring the Docker containers.
 
 ## Bash commands
 
@@ -33,9 +29,10 @@ docker compose down -v --rmi all --remove-orphans
 - Files in this repo are in the `/project` folder. That means, `server.c` is `/project/project/server.c` in the container.
 
 ## TODO
+To compile the source code and create an executable, run
 
-    ###########################################################
-    ##                                                       ##
-    ## REPLACE CONTENT OF THIS FILE WITH YOUR PROJECT REPORT ##
-    ##                                                       ##
-    ###########################################################
+`make`
+
+To run the server and receive incoming HTTP request through localhost port 8080, run
+
+`./server`

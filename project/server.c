@@ -76,11 +76,7 @@ int main(int argc, char *argv[]) {
 
     printf("connection accepted\n");
 
-    int sockName = getsockname(singlesock, (struct sockaddr *)&clientAddr, (socklen_t *)&clientAddr_len);
-    if (sockName < 0){
-      perror("server: getsockname");
-      continue;
-    }
+    
     if (read(singlesock, buf, 1024) < 0){
       perror("server: read\n");
       continue;
@@ -139,35 +135,37 @@ int main(int argc, char *argv[]) {
       uri_modified_lowercase[i] = tolower(uri_modified_lowercase[i]);
     }
 
-    // DIR *directory;
-    // char workingdir[1024];
-    // if (getcwd(workingdir, 1024) == NULL){
-    //   perror("server: cwd error\n");
-    //   return 1;
-    // }
-    // directory = opendir(workingdir);
-    // // struct dirent *dir;
-    // // if (directory){
-    // //   while ((dir = readdir(directory)) != NULL){
-    // //     if (!strcasecmp(uri_modified, dir->d_name)){
-    // //       strcpy(uri_modified, dir->d_name);
-    // //       break;
-    // //     }
-    // //     // char dirFileNameLower[strlen(dir->d_name)];
-    // //     // strcpy(dirFileNameLower, dir->d_name);
-    // //     // for (int i = 0; i < strlen(dirFileNameLower); i++){
-    // //     //   dirFileNameLower[i] = tolower(dirFileNameLower[i]);
-    // //     // }
-    // //     // if (!strcmp(uri_modified_lowercase, dirFileNameLower)){
-    // //     //   strcpy(uri_modified, dir->d_name);
-    // //     //   printf("uri_modified is now: %s\n", uri_modified);
-    // //     //   break;
-    // //     // }
-    // //   }
-    // //   closedir(directory);
-    // // }else{
-    // //   return 1;
-    // // }
+    DIR *directory;
+    char workingdir[1024];
+    if (getcwd(workingdir, 1024) == NULL){
+      perror("server: cwd error\n");
+      return 1;
+    }
+    directory = opendir(workingdir);
+    struct dirent *dir;
+    if (directory){
+      while ((dir = readdir(directory)) != NULL){
+        if (!strcasecmp(uri_modified, dir->d_name)){
+          printf("original requested name: %s\n", uri_modified);
+          printf("matched file name: %s\n", dir->d_name);
+          strcpy(uri_modified, dir->d_name);
+          break;
+        }
+        // char dirFileNameLower[strlen(dir->d_name)];
+        // strcpy(dirFileNameLower, dir->d_name);
+        // for (int i = 0; i < strlen(dirFileNameLower); i++){
+        //   dirFileNameLower[i] = tolower(dirFileNameLower[i]);
+        // }
+        // if (!strcmp(uri_modified_lowercase, dirFileNameLower)){
+        //   strcpy(uri_modified, dir->d_name);
+        //   printf("uri_modified is now: %s\n", uri_modified);
+        //   break;
+        // }
+      }
+      //closedir(directory);
+    }else{
+      return 1;
+    }
 
     char fileName[strlen(uri_modified)];
     if (strlen(uri_modified) > 0){
@@ -244,7 +242,7 @@ int main(int argc, char *argv[]) {
         strcat(resp, jpgresp);
       }else if (!strcmp(token, "png")){
         char pngType[] = "image/png";
-        sprintf(jpgresp, "Content-type: %s\r\n"
+        sprintf(pngresp, "Content-type: %s\r\n"
                       "Content-Length: %ld\r\n\r\n", pngType, size);
         strcat(resp, pngresp);
       }
